@@ -34,11 +34,11 @@ def main():
 
         vote(escrow_private_key, escrow_address, option_zero_address, option_one_address, client)
 
+        wait_for_x_secs(5)
+
         option_one_count, option_zero_count = calculate_votes(
             [option_one_address, option_zero_address], client
         )
-
-        wait_for_x_secs(5)
 
         winner(option_zero_count, option_one_count)
 
