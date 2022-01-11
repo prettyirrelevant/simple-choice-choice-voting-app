@@ -1,5 +1,4 @@
 from algosdk.v2client import algod
-from decouple import config
 
 from helpers import (
     calculate_votes,
@@ -7,22 +6,22 @@ from helpers import (
     mnemonic,
     validate_escrow_wallet,
     vote,
+    wait_for_x_secs,
     winner,
 )
 
-ALGOD_ADDRESS = config("ALGOD_ADDRESS")
-ALGOD_TOKEN = config("ALGOD_TOKEN")
-
-headers = {
-    "X-API-Key": ALGOD_TOKEN,
-}
+ALGOD_ADDRESS = "https://testnet.algoexplorerapi.io"
+ALGOD_TOKEN = ""
+headers = {"User-Agent": "Blank!"}
 client = algod.AlgodClient(ALGOD_TOKEN, ALGOD_ADDRESS, headers)
 
 
 def main():
     """Entrypoint for the application."""
     escrow_address = str(input("Enter escrow address: "))
-    escrow_mnemonic = str(input("Enter escrow mnemonic: "))
+    escrow_mnemonic = str(
+        input("Enter escrow mnemonic (Each word should be separate by whitespace): ")
+    )
 
     is_valid = validate_escrow_wallet(escrow_address, escrow_mnemonic, client)
     if not is_valid:
@@ -38,6 +37,9 @@ def main():
         option_one_count, option_zero_count = calculate_votes(
             [option_one_address, option_zero_address], client
         )
+
+        wait_for_x_secs(5)
+
         winner(option_zero_count, option_one_count)
 
 

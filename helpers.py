@@ -1,3 +1,5 @@
+import time
+
 from algosdk import account, mnemonic
 from algosdk.encoding import is_valid_address
 from algosdk.future.transaction import AssetTransferTxn, PaymentTxn
@@ -35,7 +37,7 @@ def contains_choice_coin(address: str, client) -> bool:
     contains_choice = False
 
     for asset in account["assets"]:
-        if asset["asset-id"] == asset:
+        if asset["asset-id"] == CHOICE_ASSET_ID:
             contains_choice = True
             break
 
@@ -82,7 +84,7 @@ def opt_in_to_choice(private_key: str, address: str, client) -> bool:
     """Opt in a wallet to Choice Coin."""
 
     suggested_params = client.suggested_params()
-    if not contains_choice_coin(address):
+    if not contains_choice_coin(address, client):
         unsigned_transaction = AssetTransferTxn(
             address, suggested_params, address, 0, CHOICE_ASSET_ID
         )
@@ -94,7 +96,7 @@ def opt_in_to_choice(private_key: str, address: str, client) -> bool:
 
 def vote(escrow_private_key, escrow_address, option_zero_address, option_one_address, client):
     """Places a vote based on the input of the user."""
-    voter = int(input("Vote 0 for zero and vote 1 for one:"))
+    voter = int(input("Vote 0 for zero and vote 1 for one: "))
     if voter == 1:
         make_vote(
             escrow_address,
@@ -152,3 +154,12 @@ def winner(option_zero_count, option_one_count):
         print("Option zero wins.")
     else:
         print("Option one wins.")
+
+
+def wait_for_x_secs(delay: float) -> None:
+    """Specify the number of seconds the program should delay for."""
+
+    # A block takes approximately four(4) seconds to be added to the blockchain on Algorand
+    print(f"Waiting for {delay} second(s) for blockchain to sync...")
+
+    time.sleep(delay)
